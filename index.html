@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>محمد سام</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+html, body { height:100%; overflow:hidden; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Google Sans', Tahoma, sans-serif;
+  background: linear-gradient(to bottom, #000000 0%, #000000 50%, #071223 78%, #0a1c3a 100%);
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  position: relative;
+  overflow: hidden;
+}
+
+/* ============ هدر — کپی Gemini ============ */
+.header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 16px; flex-shrink: 0; z-index: 10;
+}
+.header-left { display: flex; align-items: center; gap: 8px; }
+
+.menu-icon {
+  width: 28px; height: 28px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; border-radius: 50%;
+  transition: background .2s; position: relative;
+}
+.menu-icon:hover { background: rgba(255,255,255,.08); }
+.menu-icon::before {
+  content:''; position:absolute; top:2px; right:4px;
+  width:6px; height:6px; border-radius:50%; background:#4285f4;
+}
+.menu-icon svg { width:22px; height:22px; }
+
+.model-name {
+  font-size: 1.05rem; font-weight: 400; color:#e3e3e3;
+  display: flex; align-items: center; gap: 6px;
+  cursor: pointer; padding: 6px 8px; border-radius: 8px;
+  transition: background .2s;
+}
+.model-name:hover { background: rgba(255,255,255,.08); }
+.model-name svg { width:14px; height:14px; opacity:.8; }
+
+.header-right { display:flex; align-items:center; gap:12px; }
+
+.compose-icon {
+  width: 30px; height: 30px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; border-radius: 50%;
+  transition: background .2s; position: relative;
+}
+.compose-icon:hover { background: rgba(255,255,255,.08); }
+.compose-icon::before {
+  content:''; position:absolute; inset:2px;
+  border-radius:50%; border:1.5px dashed #5f6368;
+}
+.compose-icon svg { width:14px; height:14px; color:#e3e3e3; }
+
+.avatar {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: linear-gradient(135deg,#4285f4,#9b72cb,#d96570);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 600; color:#fff;
+  cursor: pointer; flex-shrink: 0;
+}
+
+/* ============ محتوای وسط ============ */
+.center-content {
+  flex: 1; display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 20px; z-index: 1; overflow: hidden;
+}
+.center-content.hidden { display: none; }
+
+.gemini-logo {
+  width: 90px; height: 90px; margin-bottom: 40px;
+  animation: logoFloat 4s ease-in-out infinite;
+}
+@keyframes logoFloat {
+  0%,100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-8px) scale(1.03); }
+}
+
+.welcome-text {
+  font-size: 1.75rem; font-weight: 400; color:#fff;
+  text-align: center; line-height: 1.4;
+  letter-spacing: -0.5px;
+  animation: fadeInUp .8s ease;
+}
+@keyframes fadeInUp {
+  from { opacity:0; transform: translateY(20px); }
+  to { opacity:1; transform: translateY(0); }
+}
+
+/* ============ ناحیه چت ============ */
+.chat-area {
+  flex: 1; overflow-y: auto;
+  padding: 0 16px 140px;
+  display: none; scroll-behavior: smooth;
+}
+.chat-area.active { display: block; }
+.chat-area::-webkit-scrollbar { width: 4px; }
+.chat-area::-webkit-scrollbar-thumb { background:#333; border-radius:4px; }
+
+.message {
+  display: flex; gap: 10px; margin-bottom: 18px;
+  animation: msgIn .3s ease; max-width: 100%;
+}
+@keyframes msgIn {
+  from { opacity:0; transform: translateY(10px); }
+  to { opacity:1; transform: translateY(0); }
+}
+.message.user { flex-direction: row-reverse; }
+
+.message-avatar {
+  width: 30px; height: 30px; border-radius: 50%; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 600;
+}
+.message-avatar.ai {
+  background: linear-gradient(135deg,#4285f4,#9b72cb); color:#fff;
+}
+.message-avatar.user-av { background:#444746; color:#fff; }
+
+.message-bubble {
+  background: #1e1f20; border-radius: 18px;
+  padding: 12px 16px; max-width: 80%;
+  font-size: .93rem; line-height: 1.75; color:#e3e3e3;
+  word-wrap: break-word; white-space: pre-wrap;
+}
+.message.user .message-bubble {
+  background:#004a77; color:#fff; border-bottom-right-radius:4px;
+}
+.message.ai .message-bubble { border-bottom-left-radius:4px; }
+.message-bubble img {
+  max-width: 100%; border-radius: 12px;
+  margin-top: 10px; display: block;
+}
+.message-bubble code {
+  background: #2a2b2d; padding: 2px 6px; border-radius: 4px;
+  font-family: monospace; font-size: .85em; direction: ltr;
+  display: inline-block;
+}
+.message-bubble pre {
+  background: #0d0d0d; padding: 12px; border-radius: 8px;
+  margin: 8px 0; overflow-x: auto; direction: ltr; text-align: left;
+  font-family: monospace; font-size: .82rem; line-height: 1.5;
+}
+
+/* تایپینگ */
+.typing-indicator { display: flex; gap: 4px; padding: 4px 0; }
+.typing-dot {
+  width: 7px; height: 7px; border-radius: 50%; background: #888;
+  animation: typingBounce 1.4s infinite ease-in-out;
+}
+.typing-dot:nth-child(2) { animation-delay:.2s; }
+.typing-dot:nth-child(3) { animation-delay:.4s; }
+@keyframes typingBounce {
+  0%,60%,100% { transform: translateY(0); opacity:.4; }
+  30% { transform: translateY(-5px); opacity:1; }
+}
+
+/* ============ نوار ورودی پایین ============ */
+.input-bar-container {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  padding: 10px 14px 22px;
+  background: linear-gradient(to top, #0a1c3a 0%, #071223 50%, transparent 100%);
+  z-index: 50;
+}
+.input-bar {
+  display: flex; align-items: center;
+  background: #1e1f20; border-radius: 999px;
+  padding: 6px 8px; gap: 6px; min-height: 52px;
+  box-shadow: 0 2px 12px rgba(0,0,0,.4);
+}
+.icon-btn {
+  width: 40px; height: 40px; border-radius: 50%;
+  border: none; background: transparent; color:#e3e3e3;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; transition: background .2s; font-family: inherit;
+}
+.icon-btn:hover { background: rgba(255,255,255,.08); }
+.icon-btn svg { width: 20px; height: 20px; }
+
+.chat-input {
+  flex: 1; background: transparent; border: none;
+  color: #e3e3e3; font-size: .95rem; font-family: inherit;
+  outline: none; padding: 8px 4px; min-width: 0; direction: rtl;
+}
+.chat-input::placeholder { color:#8e918f; }
+
+.send-btn {
+  width: 40px; height: 40px; border-radius: 50%;
+  border: none; background:#2b2d2f; color:#5f6368;
+  cursor: not-allowed; display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; transition: all .2s; font-family: inherit;
+}
+.send-btn.active { background:#e3e3e3; color:#000; cursor: pointer; }
+.send-btn svg { width:20px; height:20px; }
+
+.icon-btn.recording {
+  background:#ff4444; color:#fff; animation: recPulse 1s infinite;
+}
+@keyframes recPulse {
+  0%,100% { box-shadow: 0 0 0 0 rgba(255,68,68,.6); }
+  50% { box-shadow: 0 0 0 10px rgba(255,68,68,0); }
+}
+
+/* ============ توست ============ */
+.toast {
+  position: fixed; bottom: 90px; left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: #2b2d2f; color:#e3e3e3;
+  padding: 10px 20px; border-radius: 20px;
+  font-size: .82rem; opacity: 0; transition: all .3s;
+  pointer-events: none; z-index: 200; max-width: 90%; text-align: center;
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* ============ لودر پشت صحنه ============ */
+.loader-overlay {
+  position: fixed; inset: 0; background: #000;
+  display: none; flex-direction: column;
+  align-items: center; justify-content: center; z-index: 999;
+}
+.loader-overlay.show { display: flex; }
+
+.loader-logo {
+  width: 80px; height: 80px; margin-bottom: 24px;
+  animation: logoFloat 2s ease-in-out infinite;
+}
+.loader-text {
+  font-size: .95rem; color:#9aa0a6; margin-bottom: 16px;
+}
+.loader-model-name {
+  font-size: .8rem; color:#5f6368; height: 20px;
+  transition: opacity .3s; max-width: 90%; text-align: center;
+}
+.loader-progress {
+  width: 220px; height: 3px; background:#1e1f20;
+  border-radius: 3px; margin-top: 20px; overflow: hidden;
+}
+.loader-progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg,#4285f4,#9b72cb,#d96570);
+  width: 0%; transition: width .3s; border-radius: 3px;
+}
+
+@media (max-width: 400px) {
+  .welcome-text { font-size: 1.45rem; }
+  .gemini-logo { width: 75px; height: 75px; margin-bottom: 32px; }
+  .message-bubble { font-size: .88rem; }
+}
+</style>
+</head>
+<body>
+
+<!-- ============ هدر ============ -->
+<header class="header">
+  <div class="header-left">
+    <div class="menu-icon" onclick="newChat()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#e3e3e3" stroke-width="2" stroke-linecap="round">
+        <line x1="3" y1="6" x2="21" y2="6"/>
+        <line x1="3" y1="12" x2="21" y2="12"/>
+        <line x1="3" y1="18" x2="21" y2="18"/>
+      </svg>
+    </div>
+    <div class="model-name">
+      <span>Gemini Flash</span>
+      <svg viewBox="0 0 24 24" fill="none" stroke="#e3e3e3" stroke-width="2">
+        <path d="M6 9l6 6 6-6"/>
+      </svg>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="compose-icon" onclick="newChat()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#e3e3e3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 20h9"/>
+        <path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/>
+      </svg>
+    </div>
+    <div class="avatar" onclick="showToast('مدیریت: محمد سام ملک‌زاده')">م</div>
+  </div>
+</header>
+
+<!-- ============ محتوای وسط ============ -->
+<div class="center-content" id="centerContent">
+  <svg class="gemini-logo" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="gemGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#4285f4"/>
+        <stop offset="30%" stop-color="#9b72cb"/>
+        <stop offset="60%" stop-color="#d96570"/>
+        <stop offset="100%" stop-color="#f2a600"/>
+      </linearGradient>
+    </defs>
+    <path d="M50 5 C52 30, 70 48, 95 50 C70 52, 52 70, 50 95 C48 70, 30 52, 5 50 C30 48, 48 30, 50 5 Z"
+          fill="url(#gemGrad)"/>
+  </svg>
+  <div class="welcome-text">سلام من محمد سام هستم</div>
+</div>
+
+<!-- ============ ناحیه چت ============ -->
+<div class="chat-area" id="chatArea"></div>
+
+<!-- ============ نوار ورودی ============ -->
+<div class="input-bar-container">
+  <div class="input-bar">
+    <button class="icon-btn" onclick="showToast('به‌زودی...')" title="پیوست">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <line x1="12" y1="5" x2="12" y2="19"/>
+        <line x1="5" y1="12" x2="19" y2="12"/>
+      </svg>
+    </button>
+    <input type="text" class="chat-input" id="chatInput" placeholder="Ask Gem..." autocomplete="off">
+    <button class="icon-btn" id="micBtn" onclick="toggleVoice()" title="میکروفون">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/>
+        <path d="M19 10v2a7 7 0 01-14 0v-2"/>
+        <line x1="12" y1="19" x2="12" y2="23"/>
+        <line x1="8" y1="23" x2="16" y2="23"/>
+      </svg>
+    </button>
+    <button class="send-btn" id="sendBtn" onclick="sendMessage()" title="ارسال">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="12" y1="19" x2="12" y2="5"/>
+        <polyline points="5 12 12 5 19 12"/>
+      </svg>
+    </button>
+  </div>
+</div>
+
+<!-- ============ توست ============ -->
+<div class="toast" id="toast"></div>
+
+<!-- ============ لودر پشت صحنه ============ -->
+<div class="loader-overlay" id="loaderOverlay">
+  <svg class="loader-logo" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="gemGrad2" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#4285f4"/>
+        <stop offset="30%" stop-color="#9b72cb"/>
+        <stop offset="60%" stop-color="#d96570"/>
+        <stop offset="100%" stop-color="#f2a600"/>
+      </linearGradient>
+    </defs>
+    <path d="M50 5 C52 30, 70 48, 95 50 C70 52, 52 70, 50 95 C48 70, 30 52, 5 50 C30 48, 48 30, 50 5 Z"
+          fill="url(#gemGrad2)"/>
+  </svg>
+  <div class="loader-text">در حال مشورت با مدل‌های هوش مصنوعی...</div>
+  <div class="loader-model-name" id="loaderModelName">آماده‌سازی...</div>
+  <div class="loader-progress">
+    <div class="loader-progress-bar" id="loaderProgressBar"></div>
+  </div>
+</div>
+
+<script>
+/* ==========================================================
+   متغیرها
+   ========================================================== */
+let isFirstMessage = true;
+let isRecording = false;
+let recognition = null;
+let conversationHistory = [];
+
+const chatArea = document.getElementById('chatArea');
+const chatInput = document.getElementById('chatInput');
+const sendBtn = document.getElementById('sendBtn');
+const centerContent = document.getElementById('centerContent');
+const loaderOverlay = document.getElementById('loaderOverlay');
+const loaderModelName = document.getElementById('loaderModelName');
+const loaderProgressBar = document.getElementById('loaderProgressBar');
+
+/* ==========================================================
+   نام مدل‌ها — برای نمایش در لودر (فقط برای اینکه کاربر ببیند پشت صحنه کار می‌شود)
+   ========================================================== */
+const MODEL_NAMES = [
+  'DeepSeek V3', 'GPT-4o mini', 'Llama 3.1 70B', 'Mistral Large',
+  'Qwen 2.5 72B', 'Claude 3 Haiku', 'Gemini 1.5 Flash', 'Mistral Small',
+  'Llama 3.1 8B', 'Llama 3.2 90B', 'Qwen 2.5 Coder', 'DeepSeek Coder V2',
+  'Codestral', 'Phi-3 Medium', 'Gemma 2 27B', 'DBRX Instruct',
+  'Command R+', 'WizardLM 2', 'Solar 10.7B', 'Zephyr 141B',
+  'Nous Hermes 2', 'OpenHermes 2.5', 'Dolphin Mixtral', 'MythoMax',
+  'Airoboros', 'Smaug 72B', 'Bagel 34B', 'Tulu 2',
+  'Yi 34B', 'Falcon 180B', 'Starling LM', 'OpenChat 3.5'
+];
+
+/* ==========================================================
+   پرامپت سیستمی — لحن خودمونی
+   ========================================================== */
+const SYSTEM_PROMPT = `تو «محمد سام» هستی، یک رفیق باهوش و خودمونی که همیشه آماده کمک‌کردنه.
+
+قوانین مهم:
+- مثل یه رفیق صمیمی و باحال حرف بزن، خشک و رسمی نباش
+- فارسی روان و محاوره‌ای بنویس (مثلاً «چیکار می‌تونی بکنی» نه «چه کاری می‌توانید انجام دهید»)
+- هر بار جواب متفاوت بده — یه بار بگو «آره داداش»، یه بار «باشه رفیق»، یه بار «حتماً»
+- از ایموجی به اندازه و بجا استفاده کن (نه زیاد، نه کم)
+- اگر کسی سوال جدی پرسید، جدی جواب بده. اگر شوخی کرد، شوخی کن
+- هیچوقت نگو «من یک مدل زبانی هستم» — تو محمد سام هستی
+- جواب‌ها رو دقیق و کامل بده ولی مثل رفیق، نه مثل کتاب درسی
+
+سوال کاربر: `;
+
+/* ==========================================================
+   پرامپت داور — برای ترکیب پاسخ‌ها
+   ========================================================== */
+const JUDGE_PROMPT = `تو «محمد سام» هستی — یه رفیق باهوش و خودمونی.
+
+چند مدل هوش مصنوعی به این سوال کاربر جواب دادن:
+«{QUESTION}»
+
+جواب‌هاشون ایناست:
+{RESPONSES}
+
+حالا تو باید بهترین جواب رو به فارسی خودمونی و صمیمی بدی. قوانین:
+1. مثل یه رفیق باهوش حرف بزن، خشک نباش
+2. بهترین نکات همه جواب‌ها رو ترکیب کن
+3. اگر تناقضی بود، منطقی‌ترین رو انتخاب کن
+4. از ایموجی بجا استفاده کن 😎
+5. فقط جواب نهایی رو بنویس — هیچ توضیح اضافی، هیچ مقدمه‌ای
+6. اگر جواب‌ها ضعیف بودن، خودت جواب کامل و درست بده
+
+جواب نهایی:`;
+
+/* ==========================================================
+   توابع کمکی
+   ========================================================== */
+function showToast(msg, duration = 2500) {
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), duration);
+}
+
+function escapeHtml(text) {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+function scrollToBottom() {
+  setTimeout(() => { chatArea.scrollTop = chatArea.scrollHeight; }, 50);
+}
+
+function pickRandom(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+
+/* ==========================================================
+   ورودی
+   ========================================================== */
+chatInput.addEventListener('input', function() {
+  sendBtn.classList.toggle('active', !!this.value.trim());
+});
+
+chatInput.addEventListener('keydown', function(e) {
+  if (e.key === 'Enter' && this.value.trim()) {
+    e.preventDefault();
+    sendMessage();
+  }
+});
+
+/* ==========================================================
+   گفتگوی جدید
+   ========================================================== */
+function newChat() {
+  conversationHistory = [];
+  chatArea.innerHTML = '';
+  chatArea.classList.remove('active');
+  centerContent.classList.remove('hidden');
+  centerContent.style.display = 'flex';
+  isFirstMessage = true;
+  showToast('گفتگوی جدید شروع شد ✨');
+}
+
+/* ==========================================================
+   ارسال پیام
+   ========================================================== */
+async function sendMessage() {
+  const text = chatInput.value.trim();
+  if (!text) return;
+
+  if (isFirstMessage) {
+    centerContent.classList.add('hidden');
+    centerContent.style.display = 'none';
+    chatArea.classList.add('active');
+    isFirstMessage = false;
+  }
+
+  addMessage('user', text);
+  conversationHistory.push({ role: 'user', content: text });
+  chatInput.value = '';
+  sendBtn.classList.remove('active');
+
+  const isImageRequest = /(عکس|تصویر|بکش|نقاشی|draw|image|picture|بساز.*(عکس|تصویر))/i.test(text);
+
+  if (isImageRequest) {
+    await handleImageRequest(text);
+  } else {
+    await handleTextRequest(text);
+  }
+}
+
+/* ==========================================================
+   پیام‌ها
+   ========================================================== */
+function addMessage(role, text, isImage = false, imageUrl = null) {
+  const msg = document.createElement('div');
+  msg.className = `message ${role}`;
+  const avatarClass = role === 'user' ? 'user-av' : 'ai';
+
+  let bubbleContent = formatText(text);
+  if (isImage && imageUrl) {
+    bubbleContent += `<img src="${imageUrl}" alt="تصویر" loading="lazy">`;
+  }
+
+  msg.innerHTML = `
+    <div class="message-avatar ${avatarClass}">م</div>
+    <div class="message-bubble">${bubbleContent}</div>
+  `;
+  chatArea.appendChild(msg);
+  scrollToBottom();
+}
+
+function formatText(text) {
+  let t = escapeHtml(text);
+  // کد بلاک
+  t = t.replace(/```(\w+)?\n?([\s\S]*?)```/g, '<pre>$2</pre>');
+  // کد اینلاین
+  t = t.replace(/`([^`]+)`/g, '<code>$1</code>');
+  return t;
+}
+
+function addTypingIndicator() {
+  const msg = document.createElement('div');
+  msg.className = 'message ai';
+  msg.id = 'typingMsg';
+  msg.innerHTML = `
+    <div class="message-avatar ai">م</div>
+    <div class="message-bubble">
+      <div class="typing-indicator">
+        <div class="typing-dot"></div>
+        <div class="typing-dot"></div>
+        <div class="typing-dot"></div>
+      </div>
+    </div>
+  `;
+  chatArea.appendChild(msg);
+  scrollToBottom();
+}
+
+function removeTypingIndicator() {
+  const el = document.getElementById('typingMsg');
+  if (el) el.remove();
+}
+
+/* ==========================================================
+   لودر پشت صحنه — کاربر فقط اسم مدل‌ها را می‌بیند
+   ========================================================== */
+function showModelLoader() {
+  return new Promise((resolve) => {
+    loaderOverlay.classList.add('show');
+    let progress = 0;
+    let modelIndex = 0;
+
+    // ترتیب تصادفی مدل‌ها
+    const shuffled = [...MODEL_NAMES].sort(() => Math.random() - 0.5);
+
+    const interval = setInterval(() => {
+      progress += Math.random() * 6 + 2;
+      if (progress > 95) progress = 95;
+      loaderProgressBar.style.width = progress + '%';
+
+      if (modelIndex < shuffled.length) {
+        loaderModelName.textContent = `نظر از: ${shuffled[modelIndex]}`;
+        modelIndex++;
+      }
+
+      if (progress >= 95) {
+        clearInterval(interval);
+        setTimeout(() => {
+          loaderProgressBar.style.width = '100%';
+          setTimeout(() => {
+            loaderOverlay.classList.remove('show');
+            loaderProgressBar.style.width = '0%';
+            resolve();
+          }, 300);
+        }, 400);
+      }
+    }, 150);
+  });
+}
+
+/* ==========================================================
+   درخواست متنی — همه چیز پشت صحنه
+   ========================================================== */
+async function handleTextRequest(userText) {
+  addTypingIndicator();
+
+  try {
+    // نمایش لودر
+    await showModelLoader();
+
+    // ساخت پرامپت
+    const prompt = SYSTEM_PROMPT + userText;
+
+    // ارسال به چند مدل به صورت موازی — همه پشت صحنه
+    const models = ['openai', 'mistral', 'llama'];
+    const responses = await Promise.allSettled(
+      models.map(m =>
+        fetch(`https://text.pollinations.ai/${encodeURIComponent(prompt)}?model=${m}`)
+          .then(r => r.ok ? r.text() : Promise.reject('خطا'))
+          .catch(() => null)
+      )
+    );
+
+    // جمع‌آوری پاسخ‌های معتبر
+    const validResponses = responses
+      .filter(r => r.status === 'fulfilled' && r.value)
+      .map(r => r.value.trim())
+      .filter(t => t.length > 20);
+
+    let finalAnswer = '';
+
+    if (validResponses.length === 0) {
+      // پاسخ آفلاین
+      finalAnswer = getOfflineReply(userText);
+    } else if (validResponses.length === 1) {
+      finalAnswer = validResponses[0];
+    } else {
+      // داور نهایی — همه پاسخ‌ها را ترکیب می‌کند
+      finalAnswer = await getConsensus(validResponses, userText);
+    }
+
+    removeTypingIndicator();
+    addMessage('ai', finalAnswer);
+    conversationHistory.push({ role: 'assistant', content: finalAnswer });
+
+    // خواندن صوتی کوتاه
+    if (finalAnswer.length < 500) speakText(finalAnswer);
+
+  } catch (err) {
+    removeTypingIndicator();
+    addMessage('ai', `❌ خطا: ${err.message || 'مشکل در ارتباط'}`);
+  }
+}
+
+/* ==========================================================
+   داور نهایی — پشت صحنه
+   ========================================================== */
+async function getConsensus(answers, question) {
+  try {
+    // ساخت متن پاسخ‌ها برای داور
+    const responsesText = answers.map((a, i) => `--- مدل ${i + 1} ---\n${a}`).join('\n\n');
+
+    // جایگزینی در پرامپت داور
+    const judgePrompt = JUDGE_PROMPT
+      .replace('{QUESTION}', question)
+      .replace('{RESPONSES}', responsesText);
+
+    // درخواست به مدل داور
+    const response = await fetch(
+      `https://text.pollinations.ai/${encodeURIComponent(judgePrompt)}?model=openai`
+    );
+
+    if (response.ok) {
+      const result = await response.text();
+      if (result && result.trim().length > 20) {
+        return result.trim();
+      }
+    }
+
+    // اگر داور کار نکرد، بهترین پاسخ را برگردان (طولانی‌ترین)
+    return answers.sort((a, b) => b.length - a.length)[0];
+  } catch (e) {
+    console.error('Consensus error:', e);
+    return answers.sort((a, b) => b.length - a.length)[0];
+  }
+}
+
+/* ==========================================================
+   درخواست عکس
+   ========================================================== */
+async function handleImageRequest(userText) {
+  addTypingIndicator();
+
+  try {
+    await showModelLoader();
+
+    let prompt = userText
+      .replace(/(عکس|تصویر|بکش|نقاشی|بساز|draw|image|picture|of|از)/gi, '')
+      .trim();
+
+    if (!prompt || prompt.length < 3) prompt = 'یک منظره زیبای خیالی';
+
+    const seed = Math.floor(Math.random() * 1000000);
+    const imageUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=1024&height=1024&seed=${seed}&nologo=true&model=flux`;
+
+    removeTypingIndicator();
+
+    addMessage('ai', `🎨 بفرما رفیق! اینم عکست:\n«${prompt}»`, true, imageUrl);
+    conversationHistory.push({ role: 'assistant', content: `عکس تولید شد: ${prompt}` });
+
+  } catch (err) {
+    removeTypingIndicator();
+    addMessage('ai', `❌ خطا در تولید عکس: ${err.message}`);
+  }
+}
+
+/* ==========================================================
+   پاسخ‌های آفلاین با لحن خودمونی
+   ========================================================== */
+function getOfflineReply(text) {
+  const t = text.toLowerCase().trim();
+  const replies = {
+    greeting: [
+      'سلام رفیق! 👋 چخبر؟ چیزی هست که کمکت کنم؟',
+      'درود بر تو داداش! 😎 امروز چی می‌خوای یاد بگیری؟',
+      'سلاااام! 🌟 خوش اومدی. بگو ببینم چی می‌خوای؟',
+      'هی سلام! 👋 آماده‌ام به هر سوالی جواب بدم.'
+    ],
+    farewell: [
+      'خداحافظ رفیق! 🌟 هر وقت خواستی برگرد.',
+      'بای بای! 👋 موفق باشی داداش.',
+      'فعلاً! 😊 روزت خوش بگذره.',
+      'خدانگهدار! منتظرتم باز بیای.'
+    ],
+    howAreYou: [
+      'من که همیشه سرحالم! 😄 تو چطوری؟',
+      'خوبم ممنون! 🌸 تو چه خبر؟',
+      'عالی! ⚡ آماده‌ی هر کاری. تو بگو.'
+    ],
+    thanks: [
+      'خواهش می‌کنم داداش! 🙏 کاری نکردم.',
+      'قابلی نداشت! 😊',
+      'همیشه در خدمتم رفیق 🌟'
+    ],
+    default: [
+      'هممم، این یکی رو باید بیشتر فکر کنم 🤔 دوباره بپرس.',
+      'جالب بود! 💡 یه بار دیگه با کلمات دیگه بپرس تا بهتر جواب بدم.',
+      'اِه، الان نمی‌تونم کامل جواب بدم 🙏 ولی باز امتحان کن.',
+      'سوال خوبیه! ولی یه لحظه صبر کن، شاید اینترنت وصل نیست.'
+    ]
+  };
+
+  if (/^(سلام|درود|hi|hello)/.test(t)) return pickRandom(replies.greeting);
+  if (/(خداحافظ|بای|bye)/.test(t)) return pickRandom(replies.farewell);
+  if (/(چطوری|حالت چطوره|خوبی)/.test(t)) return pickRandom(replies.howAreYou);
+  if (/(ممنون|مرسی|تشکر)/.test(t)) return pickRandom(replies.thanks);
+  return pickRandom(replies.default);
+}
+
+/* ==========================================================
+   صدا — خواندن پاسخ
+   ========================================================== */
+function speakText(text) {
+  if (!('speechSynthesis' in window)) return;
+  if (!text) return;
+
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text.substring(0, 500));
+  u.lang = 'fa-IR';
+  u.rate = 1.05;
+  u.pitch = 1.05;
+  speechSynthesis.speak(u);
+}
+
+/* ==========================================================
+   ورودی صوتی
+   ========================================================== */
+function toggleVoice() {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) {
+    showToast('مرورگر شما پشتیبانی نمی‌کند. Chrome استفاده کنید.');
+    return;
+  }
+  const micBtn = document.getElementById('micBtn');
+  if (isRecording) { recognition.stop(); return; }
+
+  recognition = new SR();
+  recognition.lang = 'fa-IR';
+  recognition.continuous = false;
+  recognition.interimResults = false;
+
+  recognition.onstart = () => {
+    isRecording = true;
+    micBtn.classList.add('recording');
+    showToast('🎤 در حال ضبط...');
+  };
+  recognition.onend = () => {
+    isRecording = false;
+    micBtn.classList.remove('recording');
+  };
+  recognition.onresult = (e) => {
+    chatInput.value = e.results[0][0].transcript;
+    sendBtn.classList.add('active');
+    setTimeout(() => sendMessage(), 400);
+  };
+  recognition.onerror = (e) => {
+    isRecording = false;
+    micBtn.classList.remove('recording');
+    if (e.error === 'not-allowed') showToast('دسترسی به میکروفون رد شد');
+  };
+  recognition.start();
+}
+
+/* ==========================================================
+   راه‌اندازی
+   ========================================================== */
+window.addEventListener('DOMContentLoaded', () => {
+  chatInput.focus();
+  console.log('✅ محمد سام آماده است — بدون API Key و VPN');
+});
+</script>
+</body>
+</html>
